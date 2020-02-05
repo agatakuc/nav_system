@@ -333,7 +333,7 @@ class Path_planning:
 
 
     # poszukiwanie ścieżki na wypełnionej wartościami tablicy
-    def create_path(self, xc, yc, R, resolution, xmax, ymax):
+    def create_path(self, xc, yc, R, resolution, xmax, ymax, x0, y0):
         pathx=[]
         pathy=[]
         pathx.append(xc)
@@ -343,8 +343,6 @@ class Path_planning:
         xc=int(xc/resolution)
         yc=int(yc/resolution)
         Rmin=R[xc][yc]
-        pathx=[]
-        pathy=[]
         pathx.append(xc*resolution+resolution/2)
         pathy.append(yc*resolution+resolution/2)
         while Rmin!=0:
@@ -387,7 +385,7 @@ class Path_planning:
         # wygładzanie ścieżki
         path=[]
         path.append([pathx[0], pathy[0]])
-        counter=0
+        counter=0      
         while counter!=(len(pathx)-3):
             differencex1=pathx[counter+1]-pathx[counter]
             differencex2=pathx[counter+2]-pathx[counter+1]
@@ -397,10 +395,13 @@ class Path_planning:
                 path.append([pathx[counter+1], pathy[counter+1]])
             counter=counter+1
         path.append([pathx[len(pathx)-1], pathy[len(pathy)-1]])
-        plt.plot(pathx, pathy, color="black")
+        path.append([x0, y0])
+        #plt.plot(pathx, pathy, color="black")
+        plt.plot([p[0] for p in path], [p[1] for p in path], color="black")
         path_starttoend=[]
         for i in range(len(path)):
             path_starttoend.append(path[len(path)-i-1])
+        print(path_starttoend)
         return path_starttoend
     
     
@@ -408,11 +409,12 @@ class Path_planning:
     def rotation_angle(self, orientation, path):
         alpha=[]
         gamma=[]
-        gamma.append((math.atan2(path[0][1], path[0][0])))
-        alpha.append(orientation+gamma[0]-np.pi/2)
-        for i in range(len(path)-2):
+        gamma.append((math.atan2(path[1][1]-path[0][1], path[1][0]-path[0][0])))
+        alpha.append(-orientation+gamma[0]-np.pi/2)
+        for i in range(1,len(path)-2):
             gamma.append((math.atan2(path[i+1][1]-path[i][1], path[i+1][0]-path[i][0])))
-            alpha.append(gamma[i+1]-gamma[i])
+            alpha.append(gamma[i]-gamma[i-1])
+        print(alpha)
         return alpha
 
 
@@ -421,6 +423,7 @@ class Path_planning:
         distance=[]
         for i in range(len(path)-1):
             distance.append(np.sqrt((path[i+1][1]-path[i][1])**2+(path[i+1][0]-path[i][0])**2))
+        print(distance)
         return distance
 
 

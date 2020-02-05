@@ -30,7 +30,7 @@ start_time=time.time()
 
 # Pobieranie wartości poszczególnych markerów przy działającej kamerze
 # do odkomentowania przy pracy z kamerą
-"""
+
 with server.Client() as c:
     markers = c.read(server.READ_MARKERS)["markers"]
 
@@ -39,10 +39,10 @@ counter=0
 for marker in markers:
     marker.insert(3,float(counter))
     counter=counter+1
-"""
+
 # pobieranie wartości markerów z pliku tekstowego
 # do zakomentowania przy pracy z kamerą
-
+"""
 file = open('markers.txt', 'r').read()
 lines=file.replace("{'markers': [[", "")
 lines=lines.replace("]]}", "")
@@ -62,7 +62,7 @@ for line in lines:
     markers.append(point)
     counter=counter+1
 
-
+"""
 
 # struktura pliku figures.txt:
 # ID, TYP, parametry
@@ -111,7 +111,7 @@ virtual_path.wave_propagation_map(x0, y0, P, resolution, obstacle, xmax, ymax)
 #Znalezienie ścieżki
 #do odkomentowania przy pracy z kamerą
 
-path=virtual_path.create_path(xaim, yaim, P, resolution, xmax, ymax)
+path=virtual_path.create_path(xaim, yaim, P, resolution, xmax, ymax, x0, y0)
 
 
 #wyznaczenie kolejnych katów obrotu
@@ -121,17 +121,22 @@ alpha=virtual_path.rotation_angle(markers[4][2], path)
 # wyznaczenie dlugosci
 distance=virtual_path.distance(path)
 
+# rysowanie mapy
+plt.grid(which='both', axis='both')
+plt.axis('equal')
+plt.show()
+plt.axis('scaled')
 
 #do odkomentowania przy pracy z kamerą
 # przekazywanie danych wyjściowych (alpha i distance) do robota  
-"""
+
 with robot.RobotNetwork() as rn:
     for i in range(len(alpha)):
-        rn.setRobotVelocity(4, robot.ROBOTPATH_TURN, [abs(alpha[i])/np.pi, alpha[i]])
-        time.sleep(abs(alpha[i])/np.pi)
+        rn.setRobotVelocity(4, robot.ROBOTPATH_TURN, [abs(alpha[i])/np.pi * 1.2, alpha[i]])
+        time.sleep(2)
         rn.setRobotVelocity(4, robot.ROBOTPATH_LINE, [distance[i]/10, distance[i]*10])
-        time.sleep(distance[i]/10)
-"""
+        time.sleep(np.ceil(distance[i]/10))
+
 
 end_time=time.time()
 
@@ -140,8 +145,10 @@ end_time=time.time()
 virtual_path.characteristic_values(distance, alpha, start_time, end_time)
 #print(x0, y0)
 
+"""
 # rysowanie mapy
 plt.grid(which='both', axis='both')
 plt.axis('equal')
 plt.show()
 plt.axis('scaled')
+"""
